@@ -1,0 +1,174 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum vechileType {
+  Automatic
+  Manual
+}
+
+model User {
+  userId          Int       @id @default(autoincrement())
+  username        String    @unique
+  email           String    @unique
+  verified        Boolean   @default(false)
+  otpVerify       String?   @default("")
+  otpExpired      DateTime?
+  updateOtp       String?
+  updateOtpExpire DateTime?
+
+  resetOtp        String?       @default("")
+  resetOtpExpired DateTime?
+  password        String
+  role            Role          @default(user)
+  createdAt       DateTime      @default(now())
+  updateAt        DateTime      @default(now())
+  Login           Login[]
+  // BookingInfo BookingInfo[]
+  BookingInfo     BookingInfo[]
+
+  @@map("user")
+}
+
+model Vehicle {
+  v_id            Int                 @id @default(autoincrement())
+  name            String
+  brand           String
+  model           String
+  description     String?
+  licensePlate    String              @unique
+  vin             String?             @unique // optional vehicle identification number
+  mileage         Int? // in kilometers
+  fuelType        VehicleFuelType     @default(PETROL) // Gasoline, Diesel, Electric, Hybrid
+  transmission    VehicleTransmission @default(MANUAL) // Manual, Automatic
+  seatingCapacity Int
+  dailyRate       Decimal             @db.Decimal(10, 2)
+  status          VehicleStatus       @default(AVAILABLE)
+  image           String? // <-- file path for the vehicle image
+  image1          String?
+  image2          String?
+  categoryId      Int
+  category        Category            @relation(fields: [categoryId], references: [c_id])
+
+  // rentals Rental[] // relation to rental records
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  BookingInfo BookingInfo[]
+}
+
+model Category {
+  c_id        Int           @id @default(autoincrement())
+  name        String        @unique
+  vehicles    Vehicle[]
+  BookingInfo BookingInfo[]
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  RENTED
+  MAINTENANCE
+  UNAVAILABLE
+}
+
+enum VehicleFuelType {
+  PETROL
+  DIESEL
+  ELECTRIC
+  HYBRID
+}
+
+enum VehicleTransmission {
+  MANUAL
+  AUTOMATIC
+}
+
+model Admin {
+  adminId    Int      @id @default(autoincrement())
+  ownername  String   @unique
+  email      String   @unique
+  passowrd   String
+  verified   Boolean  @default(false)
+  otpVerify  String?  @default("")
+  otpExpired BigInt?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt()
+  role       Role     @default(admin)
+  Login      Login[]
+  // BookingInfo BookingInfo[]
+
+  @@map("admin")
+}
+
+enum Role {
+  user
+  admin
+  superadmin
+}
+
+model Login {
+  loginId      Int    @id @default(autoincrement())
+  userId       Int?
+  user         User?  @relation(fields: [userId], references: [userId])
+  adminId      Int?
+  admin        Admin? @relation(fields: [adminId], references: [adminId])
+  refreshToken String @unique
+  email        String
+  password     String
+  role         Role
+
+  @@map("login")
+}
+
+model BookingInfo {
+  bookingId      Int            @id @default(autoincrement())
+  bookingDate    DateTime
+  returnDate     DateTime
+  username       String         @default("")
+  useremail      String
+  vehicleId      Int
+  vehicleName    String?
+  categoryName   String?
+  categoryId     Int
+  price          Decimal        @db.Decimal(10, 2)
+  pickuplocation String
+  droplocation   String
+  licenseNo      String
+  licenseImg     String?
+  paymentMethod  PaymentMethod  @default(cashOnDelivery)
+  paymentStatus  Payment        @default(pending)
+  deliverystatus DeliveryStatus @default(pending)
+  User           User           @relation(fields: [useremail], references: [email])
+  category       Category?      @relation(fields: [categoryId], references: [c_id])
+  Vehicle        Vehicle?       @relation(fields: [vehicleId], references: [v_id])
+  createdAt      DateTime       @default(now())
+  updateAt       DateTime       @default(now())
+
+  @@map("booking")
+}
+
+enum Payment {
+  pending
+  hold
+  completed
+}
+
+enum DeliveryStatus {
+  pending
+  dilivered
+  cancled
+}
+
+enum PaymentMethod {
+  eSewa
+  khalti
+  fonePay
+  cashOnDelivery
+}
