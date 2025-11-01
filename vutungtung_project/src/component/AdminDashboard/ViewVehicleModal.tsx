@@ -42,7 +42,7 @@ const ViewVehicleModal = ({ vehicle, onClose }: Props) => {
         {/* ✅ Main Image (clickable from gallery below) */}
         {mainImage && (
           <img
-            src={`http://localhost:4000/uploads/vehicles/${mainImage}`}
+            src={`https://vutungtungrental-backend.onrender.com/uploads/vehicles/${mainImage}`}
             alt={vehicle.name || vehicle.title}
             className="w-full h-56 object-cover rounded-xl mb-6 transition-all duration-300"
             onError={(e) => {
@@ -137,7 +137,7 @@ const ViewVehicleModal = ({ vehicle, onClose }: Props) => {
               {allImages.map((img: string, index: number) => (
                 <img
                   key={index}
-                  src={`http://localhost:4000/uploads/vehicles/${img}`}
+                  src={`https://vutungtungrental-backend.onrender.com/uploads/vehicles/${img}`}
                   alt={`${vehicle.name || vehicle.title} ${index + 1}`}
                   className={`h-24 w-full object-cover rounded-lg border cursor-pointer transition-transform duration-300 ${
                     mainImage === img

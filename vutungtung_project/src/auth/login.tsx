@@ -5,6 +5,7 @@ import api from "../lib/api";
 import { z } from "zod";
 import { AuthContext } from "../context/AuthContext";
 import type { User } from "../context/AuthProvider";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"; 
 
 type AuthContextType = {
   user: User | null;
@@ -19,7 +20,18 @@ type LoginResponse = {
   email: string;
   role: "user" | "admin";
   token?: string;
+  status: boolean;
+  message: string;
+  data?: UserDetails;
 };
+
+interface UserDetails {
+  id: string;
+  email: string;
+  name?: string;
+  token?: string;
+  [key: string]: any; // optional if API may include more fields
+}
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -27,14 +39,14 @@ const loginSchema = z.object({
 });
 
 // Helper functions
-const generateNameFromEmail = (email: string): string => {
-  if (!email) return "User";
-  const username = email.split("@")[0];
-  return username
-    .split(".")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-};
+// const generateNameFromEmail = (email: string): string => {
+//   if (!email) return "User";
+//   const username = email.split("@")[0];
+//   return username
+//     .split(".")
+//     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+//     .join(" ");
+// };
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -47,6 +59,7 @@ export const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+   const [showPassword, setShowPassword] = useState(false);
 
   // ✅ Prevent accessing /login if already logged in
   useEffect(() => {
@@ -85,7 +98,7 @@ export const Login = () => {
       let userDetails: any = {};
 
       // Check if the login response has more data than we initially saw
-      if (resp.data.data && typeof resp.data.data === 'object') {
+      if (resp.data.data && typeof resp.data.data === "object") {
         console.log("Checking data object:", resp.data.data);
         // Maybe the user details are in resp.data.data
         if (resp.data.data.id || resp.data.data.email) {
@@ -96,7 +109,9 @@ export const Login = () => {
 
       // If we still don't have user details, we'll need to work with what we have
       if (!userDetails.id && !userDetails.email) {
-        console.log("No user details found in login response, using email as fallback");
+        console.log(
+          "No user details found in login response, using email as fallback"
+        );
         // For now, we'll create a basic user object with the email
         userDetails = {
           email: email,
@@ -107,7 +122,12 @@ export const Login = () => {
       // 3. Create user data with proper fallbacks
       const userData: User = {
         id: userDetails.id || `user-${Date.now()}`,
-        name: userDetails.name || userDetails.username || userDetails.fullname || userDetails.user_name || email.split('@')[0], // Use email prefix as fallback
+        name:
+          userDetails.name ||
+          userDetails.username ||
+          userDetails.fullname ||
+          userDetails.user_name ||
+          email.split("@")[0], // Use email prefix as fallback
         email: userDetails.email || email,
         role: resp.data.role || userDetails.role || "user", // Use role from login response
         token: userDetails.token || "", // No token in response, using empty string
@@ -198,13 +218,27 @@ export const Login = () => {
                 placeholder="Email"
                 className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-red"
               />
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-red"
-              />
+              {/* 👇 Password input with eye button */}
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-red pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? (
+                    <AiOutlineEyeInvisible size={22} />
+                  ) : (
+                    <AiOutlineEye size={22} />
+                  )}
+                </button>
+              </div>
 
               <button
                 type="submit"

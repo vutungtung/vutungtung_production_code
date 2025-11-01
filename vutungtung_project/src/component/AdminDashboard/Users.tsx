@@ -15,16 +15,28 @@ const Users = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const token =
-          localStorage.getItem("token") || sessionStorage.getItem("token");
+        // Get token from localStorage (stored in user object)
+        const storedUser = localStorage.getItem("user");
+        let token = null;
+        if (storedUser) {
+          try {
+            const user = JSON.parse(storedUser);
+            token = user?.token;
+          } catch (e) {
+            console.error("Error parsing user data:", e);
+          }
+        }
 
-        const res = await fetch("http://localhost:4000/user", {
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-          credentials: "include",
-        });
+        const res = await fetch(
+          "https://vutungtungrental-backend.onrender.com/user",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              ...(token && { Authorization: token }), // Backend expects raw token without "Bearer "
+            },
+            credentials: "include",
+          }
+        );
 
         if (!res.ok) throw new Error("Failed to fetch users");
 

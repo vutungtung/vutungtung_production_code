@@ -84,7 +84,7 @@ const PaymentSuccess = () => {
       const blob = await imgResponse.blob();
       formData.append("licenseImg", blob, "license.jpg");
 
-      const url = `http://localhost:4000/vehicle/book/booking/${parsedBookingData.categoryId}/${parsedBookingData.vehicleId}`;
+      const url = `https://vutungtungrental-backend.onrender.com/vehicle/book/booking/${parsedBookingData.categoryId}/${parsedBookingData.vehicleId}`;
       console.log("Creating booking with URL:", url);
 
       const response = await fetch(url, {

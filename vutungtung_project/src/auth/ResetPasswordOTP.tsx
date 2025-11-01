@@ -40,7 +40,7 @@ export const ResetPasswordOTP = () => {
       console.log("Sending verification request:", { email, otp: data.otp });
 
       const response = await fetch(
-        "http://localhost:4000/userlogin/reset-password/verify-otp",
+        "https://vutungtungrental-backend.onrender.com/userlogin/reset-password/verify-otp",
         {
           method: "POST",
           headers: {

@@ -44,7 +44,7 @@ const AddVehicleForm = ({ onSave, onClose }: AddVehicleFormProps) => {
   ];
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/category/all")
+    fetch("https://vutungtungrental-backend.onrender.com/api/category/all")
       .then((res) => res.json())
       .then((data) => setCategories(data))
       .catch((err) => console.error("Failed to fetch categories:", err));
@@ -138,10 +138,10 @@ const AddVehicleForm = ({ onSave, onClose }: AddVehicleFormProps) => {
       // ✅ DEBUG: Log the request details
       console.log(
         "Sending request to:",
-        "http://localhost:4000/api/vehicles/create"
+        "https://vutungtungrental-backend.onrender.com/api/vehicles/create"
       );
 
-      const res = await fetch("http://localhost:4000/api/vehicles/create", {
+      const res = await fetch("https://vutungtungrental-backend.onrender.com/api/vehicles/create", {
         method: "POST",
         body: form,
         credentials: "include",

@@ -70,13 +70,13 @@ const EditVehicleModal = ({
     description: vehicle?.description || "",
     images: [
       vehicle?.image
-        ? `http://localhost:4000/uploads/vehicles/${vehicle.image}`
+        ? `https://vutungtungrental-backend.onrender.com/uploads/vehicles/${vehicle.image}`
         : "",
       vehicle?.image1
-        ? `http://localhost:4000/uploads/vehicles/${vehicle.image1}`
+        ? `https://vutungtungrental-backend.onrender.com/uploads/vehicles/${vehicle.image1}`
         : "",
       vehicle?.image2
-        ? `http://localhost:4000/uploads/vehicles/${vehicle.image2}`
+        ? `https://vutungtungrental-backend.onrender.com/uploads/vehicles/${vehicle.image2}`
         : "",
     ],
     status: vehicle?.status || "AVAILABLE",
@@ -98,7 +98,7 @@ const EditVehicleModal = ({
   ];
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/category/all")
+    fetch("https://vutungtungrental-backend.onrender.com/api/category/all")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -185,7 +185,7 @@ const EditVehicleModal = ({
 
     try {
       const res = await fetch(
-        `http://localhost:4000/api/vehicles/update/${vehicle.v_id}`,
+        `https://vutungtungrental-backend.onrender.com/api/vehicles/update/${vehicle.v_id}`,
         {
           method: "PUT",
           body: form,
@@ -229,7 +229,7 @@ const EditVehicleModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+    <div className="fixed inset-0  backdrop-blur-sm bg-opacity-40 flex justify-center items-center z-50">
       <div className="bg-white w-full max-w-2xl rounded-lg shadow-lg p-6 overflow-y-auto max-h-[90vh]">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Edit Vehicle</h2>

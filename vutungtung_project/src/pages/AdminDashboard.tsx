@@ -6,7 +6,7 @@ import Overview from "../component/AdminDashboard/Overview";
 import Setting from "../component/AdminDashboard/Setting";
 import Users from "../component/AdminDashboard/Users";
 import Vehicles from "../component/AdminDashboard/Vehicles";
-import Booking from "../component/AdminDashboard/Booking";
+import BookingComponent from "../component/AdminDashboard/Booking";
 
 
 const AdminDashboard = () => {
@@ -23,7 +23,7 @@ const AdminDashboard = () => {
     Vehicles: (
       <Vehicles showAddModal={showAddModal} setShowAddModal={setShowAddModal} />
     ),
-    Bookings: <Booking />,
+    Bookings: <BookingComponent />,
     Users: <Users />,
     Settings: <Setting />,
   };

@@ -59,7 +59,7 @@ const Settings = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await fetch("https://api.example.com/settings", {
+      await fetch("", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
@@ -78,7 +78,7 @@ const Settings = () => {
     setIsLoggingOut(true);
     try {
       // Call the logout API endpoint
-      const response = await fetch("http://localhost:4000/userlogout/", {
+      const response = await fetch("https://vutungtungrental-backend.onrender.com/userlogout/", {
         method: "POST",
         credentials: "include", // Include cookies/session
         headers: {

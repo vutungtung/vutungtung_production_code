@@ -3,7 +3,6 @@ import axios from "axios";
 import { MdOutlineFilterAltOff } from "react-icons/md";
 import VehicleCard from "../component/VehicleCard";
 import Pagination from "../component/pagination";
-import { FaRegHeart, FaHeart } from "react-icons/fa";
 
 interface VehicleType {
   v_id: string | number;
@@ -27,7 +26,7 @@ const Vehicle = () => {
   const [vehiclesData, setVehiclesData] = useState<VehicleType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [favoritedVehicles, setFavoritedVehicles] = useState<string[]>([]);
+  const [favoritedVehicles, ] = useState<string[]>([]);
 
   const [filters, setFilters] = useState({
     category: "",
@@ -44,7 +43,7 @@ const Vehicle = () => {
       try {
         setLoading(true);
         const response = await axios.get<VehicleType[]>(
-          "http://localhost:4000/api/vehicles/"
+          "https://vutungtungrental-backend.onrender.com/api/vehicles/"
         );
         setVehiclesData(response.data);
         setLoading(false);
@@ -64,15 +63,15 @@ const Vehicle = () => {
   };
 
   // Handle favorite toggle
-  const handleFavoriteToggle = (vehicleId: string) => {
-    setFavoritedVehicles((prevFavorites) => {
-      if (prevFavorites.includes(vehicleId)) {
-        return prevFavorites.filter((id) => id !== vehicleId);
-      } else {
-        return [...prevFavorites, vehicleId];
-      }
-    });
-  };
+  // const handleFavoriteToggle = (vehicleId: string) => {
+  //   setFavoritedVehicles((prevFavorites) => {
+  //     if (prevFavorites.includes(vehicleId)) {
+  //       return prevFavorites.filter((id) => id !== vehicleId);
+  //     } else {
+  //       return [...prevFavorites, vehicleId];
+  //     }
+  //   });
+  // };
 
   // Filter vehicles dynamically
   const filteredVehicles = vehiclesData.filter((vehicle) => {
@@ -259,7 +258,7 @@ const Vehicle = () => {
               pricePerDay={parseInt(vehicle.dailyRate.toString())}
               isAvailable={(vehicle.status || "").toUpperCase() === "AVAILABLE"}
               isFavorited={favoritedVehicles.includes(vehicle.v_id.toString())}
-              onFavoriteToggle={handleFavoriteToggle}
+              // onFavoriteToggle={handleFavoriteToggle}
             />
           ))
         )}

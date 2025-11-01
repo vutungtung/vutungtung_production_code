@@ -37,7 +37,7 @@ export const ResetPassword = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:4000/userlogin/reset-password/",
+        "https://vutungtungrental-backend.onrender.com/userlogin/reset-password/",
         {
           method: "POST",
           headers: {

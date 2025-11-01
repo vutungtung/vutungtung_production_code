@@ -29,7 +29,7 @@ export const ForgotPassword = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:4000/userlogin/reset-password/send-otp",
+        "https://vutungtungrental-backend.onrender.com/userlogin/reset-password/send-otp",
         {
           method: "POST",
           headers: {

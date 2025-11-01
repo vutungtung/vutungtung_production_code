@@ -44,8 +44,8 @@ interface Stats {
 
 const Overview = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  const [, setVehicles] = useState<Vehicle[]>([]);
+  const [, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<Stats>({
     totalRevenue: 0,
     activeBookings: 0,
@@ -67,15 +67,39 @@ const Overview = () => {
       setLoading(true);
       setError(null);
 
+      // Get token from localStorage (stored in user object)
+      const storedUser = localStorage.getItem("user");
+      let token = null;
+      if (storedUser) {
+        try {
+          const user = JSON.parse(storedUser);
+          token = user?.token;
+        } catch (e) {
+          console.error("Error parsing user data:", e);
+        }
+      }
+
+      // Build headers with token
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: token }), // Backend expects raw token without "Bearer "
+      };
+
       // Fetch all data in parallel
       const [bookingsRes, vehiclesRes, usersRes] = await Promise.all([
-        fetch("http://localhost:4000/vehicle/book/bookingdetails/admin", {
+        fetch(
+          "https://vutungtungrental-backend.onrender.com/vehicle/book/bookingdetails/admin",
+          {
+            headers,
+            credentials: "include",
+          }
+        ),
+        fetch("https://vutungtungrental-backend.onrender.com/api/vehicles/", {
+          headers,
           credentials: "include",
         }),
-        fetch("http://localhost:4000/api/vehicles/", {
-          credentials: "include",
-        }),
-        fetch("http://localhost:4000/user", {
+        fetch("https://vutungtungrental-backend.onrender.com/user", {
+          headers,
           credentials: "include",
         }),
       ]);

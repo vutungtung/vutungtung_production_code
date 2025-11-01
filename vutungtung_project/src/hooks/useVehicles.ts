@@ -64,7 +64,8 @@ export const useVehicles = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Put your backend URL here directly
-  const BASE_URL = "http://localhost:4000/api/vehicles"; // <-- replace with your API URL
+  const BASE_URL =
+    "https://vutungtungrental-backend.onrender.com/api/vehicles"; // <-- replace with your API URL
 
   useEffect(() => {
     const fetchVehicles = async () => {

@@ -21,7 +21,13 @@ export const VerifyOTP = () => {
 
   useEffect(() => {
     const storedEmail = sessionStorage.getItem("signupEmail");
-    if (storedEmail) setEmail(storedEmail);
+    if (storedEmail) {
+      // Keep email exactly as stored (only trim) - backend might be case-sensitive
+      const trimmedEmail = storedEmail.trim();
+      setEmail(trimmedEmail);
+      // Update sessionStorage with trimmed email to ensure consistency
+      sessionStorage.setItem("signupEmail", trimmedEmail);
+    }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,7 +48,28 @@ export const VerifyOTP = () => {
 
     try {
       setLoading(true);
-      await api.post("/user/verify-otp", { email, otp });
+      
+      // Keep email exactly as it was during registration (only trim) - backend might be case-sensitive
+      const trimmedEmail = email.trim();
+      
+      console.log("Verifying OTP with:", { 
+        email: trimmedEmail, 
+        otp,
+        originalEmail: email 
+      });
+      
+      // Log the exact request being sent
+      console.log("Request payload:", JSON.stringify({ 
+        email: trimmedEmail, 
+        otp 
+      }));
+      
+      const response = await api.post("/user/verify-otp", { 
+        email: trimmedEmail, 
+        otp 
+      });
+      console.log("OTP verification response:", response);
+      
       sessionStorage.removeItem("signupEmail"); // clear email after success
 
       // ✅ Redirect to Verify Successful page
@@ -56,15 +83,31 @@ export const VerifyOTP = () => {
         const axiosErr = err as {
           response?: {
             data?: { message?: string; error?: string } | string;
+            status?: number;
           };
         };
+
+        console.log("Error response:", axiosErr.response);
+        console.log("Error status:", axiosErr.response?.status);
+        console.log("Error data:", axiosErr.response?.data);
 
         const data = axiosErr.response?.data;
 
         if (typeof data === "string") {
           serverMsg = data;
-        } else {
-          serverMsg = data?.message || data?.error || null;
+        } else if (data && typeof data === "object") {
+          // Try to get error message from various possible fields
+          serverMsg = data.message || data.error || (data as any).msg || null;
+          
+          // If still no message, show the full response for debugging
+          if (!serverMsg && axiosErr.response?.status === 400) {
+            const errorData = axiosErr.response.data;
+            if (errorData && typeof errorData === "object") {
+              serverMsg = errorData.message || errorData.error || "Invalid OTP or session expired. Please try signing up again.";
+            } else {
+              serverMsg = "Invalid OTP or session expired. Please try signing up again.";
+            }
+          }
         }
       }
 
@@ -78,11 +121,56 @@ export const VerifyOTP = () => {
     setError("");
     if (!email) return setError("No email found. Please signup first.");
     try {
-      await api.post("/user/ressend-otp", { email });
+      setLoading(true);
+      
+      // Keep email exactly as it was during registration (only trim) - backend might be case-sensitive
+      const trimmedEmail = email.trim();
+      
+      console.log("Resending OTP for email:", {
+        email: trimmedEmail,
+        originalEmail: email
+      });
+      
+      console.log("Request payload:", JSON.stringify({ 
+        email: trimmedEmail 
+      }));
+      
+      const response = await api.post("/user/ressend-otp", { 
+        email: trimmedEmail 
+      });
+      console.log("Resend OTP response:", response);
+      
       alert("OTP resent successfully! Check your email.");
     } catch (err: unknown) {
       console.error("Resend OTP error:", err);
-      setError("Failed to resend OTP. Try again later.");
+      
+      let serverMsg: string | null = null;
+      if (typeof err === "object" && err !== null && "response" in err) {
+        const axiosErr = err as {
+          response?: {
+            data?: { message?: string; error?: string } | string;
+            status?: number;
+          };
+        };
+        
+        console.log("Resend error response:", axiosErr.response);
+        console.log("Resend error status:", axiosErr.response?.status);
+        
+        const data = axiosErr.response?.data;
+        if (typeof data === "string") {
+          serverMsg = data;
+        } else if (data && typeof data === "object") {
+          serverMsg = data.message || data.error || (data as any).msg || null;
+        }
+        
+        // If 404, provide specific error
+        if (axiosErr.response?.status === 404) {
+          serverMsg = "Resend endpoint not found. Please contact support.";
+        }
+      }
+      setError(serverMsg || "Failed to resend OTP. Try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 

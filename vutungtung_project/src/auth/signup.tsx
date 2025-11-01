@@ -3,6 +3,7 @@ import { useState } from "react";
 import BackButton from "../component/navigate";
 import { signupSchema } from "../lib/validation";
 import api from "../lib/api";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 export const Signup = () => {
   const navigate = useNavigate();
@@ -14,6 +15,8 @@ export const Signup = () => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -44,17 +47,39 @@ export const Signup = () => {
     }
 
     try {
+      // Keep email as-is (trim only) - backend might be case-sensitive
+      const trimmedEmail = form.email.trim();
+      
+      console.log("Registering user with:", {
+        username: form.fullname,
+        email: trimmedEmail,
+        role: "user",
+      });
+
       const resp = await api.post("/user/register", {
         username: form.fullname,
-        email: form.email,
+        email: trimmedEmail,
         password: form.password,
         role: "user",
       });
 
       console.log("Signup success response:", resp);
+      console.log("Response data:", resp.data);
+      console.log("Full response:", JSON.stringify(resp.data, null, 2));
+      
+      // Check if registration was successful
+      const responseData = resp.data as any;
+      if (responseData && (responseData.success === false || responseData.message?.includes("error"))) {
+        setError(responseData.message || "Registration failed. Please try again.");
+        setLoading(false);
+        return;
+      }
 
-      // ✅ Store email temporarily
-      sessionStorage.setItem("signupEmail", form.email);
+      // ✅ Store email exactly as sent to backend - ensure it's stored before navigation
+      sessionStorage.setItem("signupEmail", trimmedEmail);
+      
+      // Small delay to ensure backend has processed the registration
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // ✅ Navigate without email in URL
       navigate("/verify-otp");
@@ -143,23 +168,51 @@ export const Signup = () => {
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red outline-0"
               />
 
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={form.password}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red outline-0"
-              />
+              {/* ✅ Password Field */}
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  value={form.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red outline-0 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? (
+                    <AiOutlineEyeInvisible size={22} />
+                  ) : (
+                    <AiOutlineEye size={22} />
+                  )}
+                </button>
+              </div>
 
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                value={form.confirmPassword}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red outline-0"
-              />
+              {/* ✅ Confirm Password Field */}
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red outline-0 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                >
+                  {showConfirmPassword ? (
+                    <AiOutlineEyeInvisible size={22} />
+                  ) : (
+                    <AiOutlineEye size={22} />
+                  )}
+                </button>
+              </div>
 
               <button
                 type="submit"

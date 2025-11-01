@@ -65,7 +65,7 @@ const VehicleDetails = () => {
   const fetchVehicle = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:4000/api/vehicles/id/${id}`);
+      const res = await fetch(`https://vutungtungrental-backend.onrender.com/api/vehicles/id/${id}`);
       if (!res.ok) throw new Error("Vehicle not found");
       const data = await res.json();
       setVehicle(data);
@@ -98,7 +98,7 @@ const VehicleDetails = () => {
     ) {
       return img;
     }
-    return `http://localhost:4000/uploads/vehicles/${img}`;
+    return `https://vutungtungrental-backend.onrender.com/uploads/vehicles/${img}`;
   };
 
   const getVehicleImages = (vehicle: VehicleType | null) => {

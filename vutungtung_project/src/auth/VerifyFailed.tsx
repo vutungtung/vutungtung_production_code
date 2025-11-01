@@ -9,7 +9,10 @@ export const VerifyFailed = () => {
     if (!email) return alert("No email found. Please signup first.");
 
     try {
-      await api.post("/user/resend-otp", { email });
+      // Normalize email to match registration
+      const normalizedEmail = email.toLowerCase().trim();
+      
+      await api.post("/user/ressend-otp", { email: normalizedEmail });
       alert("OTP resent successfully! Check your email.");
       navigate("/verify-otp"); // redirect back to OTP page
     } catch (err) {

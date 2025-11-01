@@ -1,49 +1,8 @@
-// // src/api/vehicleApi.ts
-// import type { NewVehicle, Vehicle } from "../types/vehicle";
-
-// export const fetchVehicles = async (): Promise<Vehicle[]> => {
-//   try {
-//     const res = await fetch("http://localhost:4000/api/vehicles/");
-//     if (!res.ok) throw new Error("Failed to fetch vehicles");
-//     const data = await res.json();
-//     return data; // Assuming backend returns an array of vehicles
-//   } catch (err) {
-//     console.error(err);
-//     return [];
-//   }
-// };
-
-// export const addVehicle = async (vehicle: NewVehicle): Promise<Vehicle> => {
-//   const res = await fetch("http://localhost:4000/api/vehicles/create/", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify(vehicle),
-//   });
-//   if (!res.ok) throw new Error("Failed to create vehicle");
-//   return await res.json();
-// };
-
-// export const updateVehicle = async (id: string, vehicle: Vehicle) => {
-//   const res = await fetch(`http://localhost:4000/api/vehicles/${id}`, {
-//     method: "PUT",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify(vehicle),
-//   });
-//   if (!res.ok) throw new Error("Failed to update vehicle");
-//   return await res.json();
-// };
-
-// export const deleteVehicle = async (id: string) => {
-//   const res = await fetch(`http://localhost:4000/api/vehicles/delete/${id}`, {
-//     method: "DELETE",
-//   });
-//   if (!res.ok) throw new Error("Failed to delete vehicle");
-// };
 
 // // src/api/vehicleApi.ts
 import type { NewVehicle, Vehicle, VehicleFront } from "../types/vehicle";
 
-const BASE_URL = "http://localhost:4000/api/vehicles";
+const BASE_URL = "https://vutungtungrental-backend.onrender.com/api/vehicles";
 
 // Fetch all vehicles
 export const fetchVehicles = async (): Promise<Vehicle[]> => {

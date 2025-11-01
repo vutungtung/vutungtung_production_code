@@ -12,6 +12,17 @@ interface BookingStats {
   totalSpent: number;
 }
 
+interface Booking {
+  id: string;
+  price: number | string;
+  paymentStatus: "pending" | "completed" | "failed";
+  deliverystatus: "pending" | "delivered" | "cancled"; // include typo if API actually sends this
+}
+
+interface UserBookingsResponse {
+  data: Booking[];
+}
+
 const UserDashboard = () => {
   const [activeTab, setActiveTab] = useState("bookings");
   const [bookingStats, setBookingStats] = useState<BookingStats>({
@@ -25,31 +36,28 @@ const UserDashboard = () => {
     const fetchBookingStats = async () => {
       try {
         setStatsLoading(true);
+
         const res = await getUserBookings();
-        const data = (res.data as any).data;
+        const data = (res.data as UserBookingsResponse).data;
 
         if (Array.isArray(data)) {
-          // Calculate total bookings (exclude cancelled ones for accurate count)
+          // ✅ Calculate total bookings (exclude cancelled ones)
           const activeBookings = data.filter(
-            (booking: any) => booking.deliverystatus !== "cancled"
+            (booking) => booking.deliverystatus !== "cancled"
           );
 
-          // Calculate total spent (only from completed payments)
+          // ✅ Calculate total spent (only completed payments)
           const totalSpent = data
             .filter(
-              (booking: any) =>
+              (booking) =>
                 booking.paymentStatus === "completed" &&
                 booking.deliverystatus !== "cancled"
             )
-            .reduce(
-              (sum: number, booking: any) =>
-                sum + parseFloat(booking.price || 0),
-              0
-            );
+            .reduce((sum, booking) => sum + Number(booking.price || 0), 0);
 
           setBookingStats({
             totalBookings: activeBookings.length,
-            totalSpent: totalSpent,
+            totalSpent,
           });
         }
       } catch (err) {
@@ -84,7 +92,7 @@ const UserDashboard = () => {
 
   // Get user data - prioritize actual name from database
   const userData = {
-    name: auth.user.name || auth.user.username || "User",
+    name: auth.user.name || "User",
     email: auth.user.email || "No email provided",
     avatar: auth.user.avatar || getAvatar(auth.user.email || "user"),
   };
